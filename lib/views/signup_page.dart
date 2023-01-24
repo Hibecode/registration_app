@@ -56,6 +56,18 @@ class _SignUpPageState extends State<SignUpPage> {
               MaterialPageRoute(builder: (context) => const SignInPage()),
             );
           } else {
+            if (response['message'].toString().toLowerCase().contains('user already exists')) {
+              Flushbar(
+                title: "Registration Successful",
+                message: response['message'].toString(),
+                duration: const Duration(seconds: 10),
+              ).show(context);
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SignInPage()),
+              );
+            }
             Flushbar(
               title: "Registration fail",
               message: response['message'].toString(),

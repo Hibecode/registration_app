@@ -13,7 +13,7 @@ class User {
     return User(
       firstName: responseData['firstName'],
       lastName: responseData['lastName'],
-      email : responseData['Email'],
+      email : responseData['email'],
       phoneNumber: responseData['phoneNumber'],
       password: responseData['password'],
     );

@@ -35,11 +35,15 @@ class AuthProvider extends ChangeNotifier {
 
   Future<Map<String, dynamic>> register(String name, String email, String password) async {
     final Map<String, dynamic> apiBodyData = {
-      'firstName': name.split('')[0],
-      'lastName': name.split('')[1],
+      'firstName': name.split(' ')[0],
+      'lastName': name.split(' ')[1],
       'email': email,
+      'phoneNumber': '01234567891',
       'password': password
     };
+
+    print('firstname: '+apiBodyData['firstName']);
+    print('lastname: '+apiBodyData['lastName']);
     var result;
 
     result =  await post(
@@ -83,7 +87,7 @@ class AuthProvider extends ChangeNotifier {
     }else{
       result = {
         'status':false,
-        'message':'Successfully registered',
+        'message':responseData['message'],
         'data':responseData
       };
     }
@@ -96,8 +100,8 @@ class AuthProvider extends ChangeNotifier {
     var result;
 
     final Map<String, dynamic> loginData = {
-      'UserName': 'kaliakoirdeo379',
-      'Password': 'kaliakoirdeo379@2020'
+      'email': email,
+      'password': password
     };
 
     _loggedInStatus = Status.Authenticating;
@@ -108,8 +112,6 @@ class AuthProvider extends ChangeNotifier {
       body: json.encode(loginData),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Basic ZGlzYXBpdXNlcjpkaXMjMTIz',
-        'X-ApiKey' : 'ZGlzIzEyMw=='
       },
     );
 
@@ -119,16 +121,20 @@ class AuthProvider extends ChangeNotifier {
 
       print(responseData);
 
-      var userData = responseData['Content'];
+      //var userData = responseData['data'];
+      //print("userData $userData");
 
-      User authUser = User.fromJson(userData);
+      //User authUser = User.fromJson(userData);
+      print(responseData);
 
       //UserPreferences().saveUser(authUser);
 
       _loggedInStatus = Status.LoggedIn;
       notifyListeners();
 
-      result = {'status': true, 'message': 'Successful', 'user.dart': authUser};
+      result = {
+        'status': true,
+        'message': 'Successful'};
 
     } else {
       _loggedInStatus = Status.NotLoggedIn;
@@ -144,10 +150,50 @@ class AuthProvider extends ChangeNotifier {
   }
 
 
+  Future<Map<String, dynamic>> forgotPassword(String email) async {
+
+    var result;
+
+    final Map<String, dynamic> inputData = {
+      'email': email,
+    };
+
+    notifyListeners();
+
+    Response response = await post(
+      Uri.parse(AppUrl.forgotPassword),
+      body: json.encode(inputData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      print(responseData);
+
+      result = {
+        'status': true,
+        'message': 'Mail has been sent'};
+
+    } else {
+      result = {
+        'status': false,
+        'message': json.decode(response.body)['error']
+      };
+    }
+
+    return result;
+
+  }
+
+
   static onError(error){
     print('the error is ${error.detail}');
     return {
-      'status':false,
+      'status': false,
       'message':'Unsuccessful Request',
       'data':error
     };

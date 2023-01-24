@@ -2,8 +2,12 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:registration_app/providers/user_provider.dart';
+import 'package:registration_app/views/forgot_password_page.dart';
+import 'package:registration_app/views/signup_page.dart';
 
 import '../app_styles.dart';
+import '../model/user.dart';
 import '../providers/auth_provider.dart';
 import '../utility/validator.dart';
 import '../widgets.dart';
@@ -41,7 +45,28 @@ class _SignInPageState extends State<SignInPage> {
 
         form.save();
 
-        final Future<Map<String, dynamic>> response = auth.login(_email, _password);
+        final Future<Map<String, dynamic>> respose = auth.login(_email, _password);
+
+        respose.then((response){
+          if (response['status']) {
+            print('on doSignup');
+            //User user = response['user'];
+
+            //Provider.of<UserProvider>(context, listen: false).setUser(user);
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SignUpPage()),
+            );
+          } else {
+            print('on doSignup3');
+            Flushbar(
+              title: "Failed Login",
+              message: response['message'].toString(),
+              duration: const Duration(seconds: 3),
+            ).show(context);
+          }
+        });
 
 
       } else{
@@ -64,7 +89,7 @@ class _SignInPageState extends State<SignInPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(height: 60),
-                    Text('Create Account', style: kTitle.copyWith(color: kBlackMainColor),),
+                    Text('Sign In', style: kTitle.copyWith(color: kBlackMainColor),),
                     SizedBox(height: 60),
 
 
@@ -100,7 +125,10 @@ class _SignInPageState extends State<SignInPage> {
                           style: kBodyText1.copyWith(color: kGrey2Color, decoration: TextDecoration.underline),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const ForgotPasswordPage()),
+                              );
                             }
                         ),
                       ]
@@ -124,10 +152,7 @@ class _SignInPageState extends State<SignInPage> {
                           TextSpan(
                               text: "Don't have an account? ",
                               style: kBodyText1.copyWith(color: kGreyColor),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
 
-                                }
                           ),
                           TextSpan(
                               text: 'Sign up',
@@ -136,7 +161,7 @@ class _SignInPageState extends State<SignInPage> {
                                 ..onTap = () {
                                   Navigator.of(context).pushAndRemoveUntil(
                                       MaterialPageRoute(
-                                          builder: (context) => const SignInPage()),
+                                          builder: (context) => const SignUpPage()),
                                           (route) => false
                                   );
                                 }
