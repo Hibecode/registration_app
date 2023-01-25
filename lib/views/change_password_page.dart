@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:registration_app/providers/user_provider.dart';
 import 'package:registration_app/views/forgot_password_page.dart';
-import 'package:registration_app/views/home_page.dart';
+import 'package:registration_app/views/signin_page.dart';
 import 'package:registration_app/views/signup_page.dart';
+import 'package:registration_app/views/verify_page.dart';
 
 import '../app_styles.dart';
 import '../model/user.dart';
@@ -13,17 +14,17 @@ import '../providers/auth_provider.dart';
 import '../utility/validator.dart';
 import '../widgets.dart';
 
-class SignInPage extends StatefulWidget {
-  const SignInPage({Key? key}) : super(key: key);
+class ChangePasswordPage extends StatefulWidget {
+  const ChangePasswordPage({Key? key}) : super(key: key);
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  State<ChangePasswordPage> createState() => _ChangePasswordPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final formKey = GlobalKey<FormState>();
 
-  late String  _email, _password;
+  late String  _oldPassword, _newPassword, _confirmNewPassword;
 
   @override
   Widget build(BuildContext context) {
@@ -38,38 +39,46 @@ class _SignInPageState extends State<SignInPage> {
 
     AuthProvider auth = Provider.of<AuthProvider>(context);
 
-    doSignin(){
-      print('on doSignup');
+    doReset(){
+      print('on doReset');
 
       final form = formKey.currentState;
       if(form!.validate()){
 
         form.save();
 
-        final Future<Map<String, dynamic>> respose = auth.login(_email, _password);
+        final Future<Map<String, dynamic>> respose = auth.resetPassword(_newPassword);
 
-        respose.then((response){
-          if (response['status']) {
-            print('on doSignup');
-            //User user = response['user'];
+        if (_newPassword == _confirmNewPassword) {
+          respose.then((response) {
+            if (response['status']) {
+              print('on doreset');
+              Flushbar(
+                title: "Reset Password",
+                message: 'Mail has been sent',
+                duration: const Duration(seconds: 5),
+              ).show(context);
 
-            //Provider.of<UserProvider>(context, listen: false).setUser(user);
-
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (context) => const HomePage()),
-                    (route) => false
-            );
-          } else {
-            print('on doSignup3');
-            Flushbar(
-              title: "Failed Login",
-              message: response['message'].toString(),
-              duration: const Duration(seconds: 3),
-            ).show(context);
-          }
-        });
-
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) => const SignInPage()),
+                      (route) => false
+              );
+            } else {
+              Flushbar(
+                title: "Failed Reset",
+                message: response['message'].toString(),
+                duration: const Duration(seconds: 3),
+              ).show(context);
+            }
+          });
+        } else{
+          Flushbar(
+            title: 'Mismatch password',
+            message: 'Please enter valid confirm password',
+            duration: const Duration(seconds: 5),
+          ).show(context);
+        }
 
       } else{
         Flushbar(
@@ -82,6 +91,20 @@ class _SignInPageState extends State<SignInPage> {
 
     return SafeArea(
         child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              color: Colors.black,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) =>  const SignInPage()),
+                );
+              },
+              icon: const Icon(Icons.arrow_back),
+            ),
+          ),
           body: SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.all(24.0),
@@ -91,16 +114,21 @@ class _SignInPageState extends State<SignInPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(height: 60),
-                    Text('Welcome Back', style: kTitle.copyWith(color: kBlackMainColor),),
+                    Text('Change Password', style: kTitle.copyWith(color: kBlackMainColor),),
                     SizedBox(height: 60),
-
 
 
                     TextFormField(
                       autofocus: false,
-                      validator: (input) => validateEmail(input!),
-                      onSaved: (input) => _email = input!,
-                      decoration: buildInputDecoration('Email'),
+                      obscureText: true,
+                      validator: (input) {
+                        if (input!.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        return null;
+                      },
+                      onSaved: (input) => _newPassword = input!,
+                      decoration: buildInputDecoration('New Password'),
                     ),
 
                     const SizedBox(height: 30),
@@ -114,46 +142,27 @@ class _SignInPageState extends State<SignInPage> {
                         }
                         return null;
                       },
-                      onSaved: (input) => _password = input!,
-                      decoration: buildInputDecoration('Password'),
+                      onSaved: (input) => _confirmNewPassword = input!,
+                      decoration: buildInputDecoration('Confirm Password'),
                     ),
-                    const SizedBox(height: 20),
 
-                    RichText(text: TextSpan(
-                      text: '',
-                      children: [
-                        TextSpan(
-                          text: 'Forgot Password?',
-                          style: kBodyText1.copyWith(color: kGrey2Color, decoration: TextDecoration.underline),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const ForgotPasswordPage()),
-                              );
-                            }
-                        ),
-                      ]
-                    )),
 
 
                     const SizedBox(height: 50),
 
-                    auth.loggedInStatus == Status.Authenticating ? loading
-                    :
-                    longButtons('LOGIN', doSignin),
-                    const SizedBox(height: 16),
-                    CustomOutlinedButton2(text: 'LOGIN WITH FINGERPRINT', onPressed: () {}),
+
+                    longButtons('RESET PASSWORD', doReset),
 
 
                     const SizedBox(height: 16),
 
-                    RichText(text: TextSpan(
+                    RichText(
+                        text: TextSpan(
                         text: '',
                         children: [
                           TextSpan(
-                              text: "Don't have an account? ",
-                              style: kBodyText1.copyWith(color: kGreyColor),
+                            text: "Don't have an account? ",
+                            style: kBodyText1.copyWith(color: kGreyColor),
 
                           ),
                           TextSpan(
@@ -198,24 +207,18 @@ class CustomOutlinedButton2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: OutlinedButton(
-            style: OutlinedButton.styleFrom(
-                minimumSize: Size.fromHeight(50),
-                side: const BorderSide(width: 2, color: kPrimaryColor),
-                foregroundColor: kPrimaryColor,
-                shape: RoundedRectangleBorder(
-                    side: BorderSide(color: kPrimaryColor),
-                    borderRadius: BorderRadius.circular(12)
-                )
-            ),
-            onPressed: onPressed,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-              const Icon(Icons.fingerprint),
-              const SizedBox(height: 8),
-              Text(text, style: kTitle.copyWith(fontSize: 14),),
-            ],)
-          ),
+        style: OutlinedButton.styleFrom(
+            minimumSize: Size.fromHeight(50),
+            side: const BorderSide(width: 2, color: kPrimaryColor),
+            foregroundColor: kPrimaryColor,
+            shape: RoundedRectangleBorder(
+                side: BorderSide(color: kPrimaryColor),
+                borderRadius: BorderRadius.circular(12)
+            )
+        ),
+        onPressed: onPressed,
+        child: Text(text, style: kTitle.copyWith(fontSize: 14),),
+      ),
 
     );
   }

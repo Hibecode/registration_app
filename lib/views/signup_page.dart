@@ -49,7 +49,11 @@ class _SignUpPageState extends State<SignUpPage> {
 
         auth.register(_name, _email, _password).then((response)   {
           if(response['status']){
-            User user = response['data'];
+            User user = User(
+                firstName: '', lastName: '',
+              email: _email, phoneNumber: '', password: '',
+
+            );
             Provider.of<UserProvider>(context).setUser(user);
             Navigator.push(
               context,

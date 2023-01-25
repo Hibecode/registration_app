@@ -172,7 +172,7 @@ class AuthProvider extends ChangeNotifier {
 
       final Map<String, dynamic> responseData = json.decode(response.body);
 
-      print(responseData);
+      print('ResponseData: ${responseData.toString()}');
 
       result = {
         'status': true,
@@ -197,6 +197,91 @@ class AuthProvider extends ChangeNotifier {
       'message':'Unsuccessful Request',
       'data':error
     };
+  }
+
+  Future<Map<String, dynamic>> verify(String email, String token) async {
+
+    var result;
+
+    print('Email: $email');
+
+    final Map<String, dynamic> inputData = {
+      'email': email,
+      'token': token
+    };
+
+    notifyListeners();
+
+    Response response = await post(
+      Uri.parse(AppUrl.verifyUser),
+      body: json.encode(inputData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    final Map<String, dynamic> responseData = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+
+
+      print(responseData);
+
+      result = {
+        'status': true,
+        'message': 'You have been verified'};
+
+    } else {
+
+      result = {
+        'status': false,
+        'message': responseData['message']
+      };
+    }
+
+    return result;
+
+  }
+
+  Future<Map<String, dynamic>> resetPassword(String password) async {
+
+    var result;
+
+    final Map<String, dynamic> inputData = {
+      'password': password
+    };
+
+    notifyListeners();
+
+    Response response = await post(
+      Uri.parse(AppUrl.resetPassword),
+      body: json.encode(inputData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    final Map<String, dynamic> responseData = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+
+
+      print(responseData);
+
+      result = {
+        'status': true,
+        'message': 'Your password has been reset'};
+
+    } else {
+
+      result = {
+        'status': false,
+        'message': responseData['message']
+      };
+    }
+
+    return result;
+
   }
 
 

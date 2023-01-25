@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:registration_app/app_styles.dart';
 import 'package:registration_app/main.dart';
 import 'package:registration_app/model/onboard_data.dart';
+import 'package:registration_app/views/signin_page.dart';
 import 'package:registration_app/views/signup_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -128,18 +129,33 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      CustomOutlinedButton(text: 'SIGN IN', onPressed: () {}),
+                      CustomOutlinedButton(text: 'SIGN IN', onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (context) => const SignInPage()),
+                                (route) => false
+                        );
+                      }),
 
-                      CustomElevatedButton(text: 'NEW ACCOUNT', onPressed: () {})
+                      CustomElevatedButton(text: 'NEW ACCOUNT', onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (context) => const SignUpPage()),
+                                (route) => false
+                        );
+                      })
 
 
                     ],
                   ) :
 
-                  longButtons('NEXT', () {
-                    _pageController.nextPage(duration: Duration(milliseconds: 400), curve: Curves.easeInOut);
-                  },
-                  color: kPrimaryColor)
+                  Padding(
+                    padding: EdgeInsets.only(left: 24, right: 24),
+                    child: longButtons('NEXT', () {
+                      _pageController.nextPage(duration: Duration(milliseconds: 400), curve: Curves.easeInOut);
+                    },
+                    color: kPrimaryColor),
+                  )
 
                 ],
               ),

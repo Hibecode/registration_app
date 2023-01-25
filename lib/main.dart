@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:registration_app/providers/auth_provider.dart';
 import 'package:registration_app/providers/user_provider.dart';
+import 'package:registration_app/views/change_password_page.dart';
+import 'package:registration_app/views/forgot_password_page.dart';
+import 'package:registration_app/views/home_page.dart';
 import 'package:registration_app/views/onboarding_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:registration_app/views/signup_page.dart';
+import 'package:registration_app/views/verify_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 bool? seenOnboard;
@@ -36,20 +40,10 @@ class MyApp extends StatelessWidget {
             ),
             primarySwatch: Colors.blue,
           ),
-          home: SignUpPage(),
+          home: const OnBoardingPage(),
       ),
     );
-    /*return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        textTheme: GoogleFonts.poppinsTextTheme(
-          Theme.of(context).textTheme
-        ),
-        primarySwatch: Colors.blue,
-      ),
-      home: *//*seenOnboard == true ? OnBoardingPage() :*//*  SignUpPage(),
-    );*/
+
   }
 }
 
