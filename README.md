@@ -1,6 +1,19 @@
 # registration_app
 
-A new Flutter project.
+A Registration App. That has:
+- Onboarding screen
+- Sign up screen
+- Signin screen
+- Forgot Password screen
+- Verfication screen
+- Change password/ password reset screen
+
+All with connected to the backend with a working API
+
+Video: 
+[final full.webm](https://user-images.githubusercontent.com/72460215/214493832-f5be3eaa-ba71-47fa-beba-6bc7a30b2ef3.webm)
+
+
 
 ## Getting Started
 
